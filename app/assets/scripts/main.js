@@ -246,7 +246,7 @@ function addMap (projectId) {
           $('.events-panel').css('display', 'none');
         } else {
           let linkMatch =  /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-          console.log(eventData);
+          // console.log(eventData);
           Object.keys(eventData).reverse().map((key, val) => {
             const eventTime = eventData[key].time[0]
             if (moment(currentDate).isBefore(eventTime)) {
@@ -580,12 +580,52 @@ function addMap (projectId) {
     };
   }
 
-
   function showUpdatesPlaceholder() {
     if ($(".Updates-Content").length === 0) {
       $(".updates-null").css('display', 'block')
       $("#updates-h1").css('text-align', 'center')
     }
+  }
+
+  /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ---------------------------------------------------------
+  --------------------- OSMCha ---------------------
+  -------------------------------------------------------*/
+
+  function makeValidation(userList){
+    const users = userList.features;
+    console.log(users);
+
+    users.forEach(function (features) {
+      console.log('USER: ' + features);
+      const output = `<tr>`+
+      `<td><a href="http://www.missingmaps.org/users/#/${features.properties.user}">${features.properties.user}</a></td>`+
+      `<td>${features.properties.date.slice(0,10)}</td>`+
+      `<td><span class="badge success">${features.properties.create}</span><span class="badge warning">${features.properties.modify}</span><span class="badge alert">${features.properties.delete}</span></td>`+
+      `<td><a href="https://osmcha.mapbox.com/changesets/${features.id}">Review Edit<a></td>`+
+      `<td>${features.properties.comment}</td>`+
+      `</tr>`
+
+      // $('#Validation-Data').insertRow(output);
+      $('#Validation-Data > tbody:last-child').append(output);
+    });
+  }
+
+
+  function getValidation (bbox) {
+
+    const bbx = bbox.split(',');
+
+    let url = `https://osmcha.mapbox.com/api/v1/changesets/?page=1&page_size=10&order_by=-date&reasons=40&date__gte=2017-11-02&in_bbox=${bbx[0]},${bbx[1]},${bbx[2]},${bbx[3]}`;
+
+    console.log(url);
+
+    $.getJSON(url, function (data) {
+      makeValidation(data)
+    })
+    .fail(function (err) {
+      console.warn('No New Mappers', err);
+    });
   }
 
   /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -606,6 +646,8 @@ function addMap (projectId) {
     getProjects(PT.hotProjects);
     // Populate events section with upcoming events
     generateEvents(PT.calendar);
+    // Populate OSMCha section with feed
+    getValidation(PT.bbox);
     // setupGraphs
     setupGraphs();
   }
