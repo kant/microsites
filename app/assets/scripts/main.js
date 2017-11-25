@@ -1,3 +1,5 @@
+/* jshint esversion: 6 */
+
 /* -------------------------------------------------------
 ------------------- Add Primary Stats -------------------
 -------------------------------------------------------*/
@@ -50,8 +52,8 @@ function getProjects (projects) {
       makeProject(projectData, i + 2);
     })
     .fail(function (err) {
-      console.warn(`WARNING >> Project #${project} could not be accessed at ${url}.\n` +
-                   'The server returned the following message object:', err);
+      // console.log(`WARNING >> Project #${project} could not be accessed at ${url}.\n` +
+      //              `The server returned the following message object:`, err);
       makePlaceholderProject(project, i + 2);
     });
   });
@@ -142,15 +144,41 @@ function onEachFeature (feature, layer) {
 }
 
 function addMap (projectId) {
-  // Connect HOT-OSM endpoint for tasking squares data
-  const endpoint = `https://tasks.hotosm.org/api/v1/project/${projectId}`;
-  $.getJSON(endpoint, function (taskData) {
-    // Remove loading spinners before placing map
-    $('#Map-' + projectId).empty();
+    // Connect HOT-OSM endpoint for tasking squares data
+    const endpoint = `https://tasks.hotosm.org/api/v1/project/${projectId}`;
+    $.getJSON(endpoint, function (taskData) {
+      // Remove loading spinners before placing map
+      $('#Map-' + projectId).empty();
 
-    // Initialize map
-    const map = L.map('Map-' + projectId,
+      // Initialize map
+      const map = L.map('Map-' + projectId,
       {zoomControl: false}).setView([38.889931, -77.009003], 13);
+
+      // Add tile layer
+      L.tileLayer(mbBasemapUrl + '?access_token=' + mbToken, {
+        attribution: '<a href="http://mapbox.com">Mapbox</a>'
+      }).addTo(map);
+
+      // Remove 'Leaflet' attribution
+      map.attributionControl.setPrefix('');
+
+      // Add feature layer
+      const featureLayer = L.geoJson(taskData.tasks, {
+        onEachFeature: onEachFeature
+      }).addTo(map);
+
+      // Fit to feature layer bounds
+      map.fitBounds(featureLayer.getBounds());
+
+      // Disable drag and zoom handlers
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.keyboard.disable();
+      if (map.tap) map.tap.disable();
+    });
+  }
 
   /* -------------------------------------------------------
   ----------- Add Functionality to Events List  -----------
@@ -213,7 +241,7 @@ function addMap (projectId) {
     if (calendarId.match(/google/)) {
       $('#events-spinner').css('display','block');
       const url = 'https://osmstats.redcross.org/calendar/' + calendarId + "/events";
-      const currentDate = new Date()
+      const currentDate = new Date();
       $.getJSON(url, (eventData) => {
         if (eventData.length === 0) {
           $('.events-null').css('display', 'block');
@@ -222,7 +250,7 @@ function addMap (projectId) {
           let linkMatch =  /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
           // console.log(eventData);
           Object.keys(eventData).reverse().map((key, val) => {
-            const eventTime = eventData[key].time[0]
+            const eventTime = eventData[key].time[0];
             if (moment(currentDate).isBefore(eventTime)) {
               const title = eventData[key].name;
               const singupLink = eventData[key].description.match(linkMatch);
@@ -270,7 +298,7 @@ function addMap (projectId) {
       $('.events-null').css('display', 'block');
       $('.events-panel').css('display', 'none');
     }
-    eventsFunctionality()
+    eventsFunctionality();
   }
 
   /* -------------------------------------------------------
@@ -330,7 +358,7 @@ function addMap (projectId) {
 
   function getUserActivityStats (countryId) {
 
-    const url = `https://osmstats.redcross.org/countries/${countryId}/users`
+    const url = `https://osmstats.redcross.org/countries/${countryId}/users`;
     $.getJSON(url, function (userData) {
       if (userData.length !== 0) {
         const totalSum = Object.keys(userData).map(function (user) {
@@ -381,7 +409,7 @@ function addMap (projectId) {
   // populate 'teams' graphs, which show activity per hashtag
   function getGroupActivityStats (countryId) {
 
-    const url = `https://osmstats.redcross.org/countries/${countryId}/hashtags`
+    const url = `https://osmstats.redcross.org/countries/${countryId}/hashtags`;
     $.getJSON(url, function (hashtagData) {
       /*
       For each hashtag, generate obj with link to hashtag's mm-leaderboards
@@ -556,8 +584,8 @@ function addMap (projectId) {
 
   function showUpdatesPlaceholder() {
     if ($(".Updates-Content").length === 0) {
-      $(".updates-null").css('display', 'block')
-      $("#updates-h1").css('text-align', 'center')
+      $(".updates-null").css('display', 'block');
+      $("#updates-h1").css('text-align', 'center');
     }
   }
 
@@ -604,40 +632,40 @@ function addMap (projectId) {
   //   });
   // }
 
-  function addeditsMap (edits) {
-     const blah = edits;
-      // Remove loading spinners before placing map
-      // $(`#Map-Box-${blah.id}`).empty();
-
-      // Initialize map
-      console.log(`#Map-Box-${blah.id}`);
-      const map = L.map(`#Map-Box-${blah.id}`,
-      {zoomControl: false}).setView([38.889931, -77.009003], 13);
-
-      // Add tile layer
-      L.tileLayer(mbBasemapUrl + '?access_token=' + mbToken, {
-        attribution: '<a href="http://mapbox.com">Mapbox</a>'
-      }).addTo(map);
-
-      // Remove 'Leaflet' attribution
-      map.attributionControl.setPrefix('');
-
-      // Add feature layer
-      const featureLayer = L.geoJson(blah.geom, {
-        onEachFeature: onEachFeature
-      }).addTo(map);
-
-      // Fit to feature layer bounds
-      map.fitBounds(featureLayer.getBounds());
-
-      // Disable drag and zoom handlers
-      map.dragging.disable();
-      map.touchZoom.disable();
-      map.doubleClickZoom.disable();
-      map.scrollWheelZoom.disable();
-      map.keyboard.disable();
-      if (map.tap) map.tap.disable();
-    }
+  // function addeditsMap (edits) {
+  //    const blah = edits;
+  //     // Remove loading spinners before placing map
+  //     // $(`#Map-Box-${blah.id}`).empty();
+  //
+  //     // Initialize map
+  //     console.log(`#Map-Box-${blah.id}`);
+  //     const map = L.map(`#Map-Box-${blah.id}`,
+  //     {zoomControl: false}).setView([38.889931, -77.009003], 13);
+  //
+  //     // Add tile layer
+  //     L.tileLayer(mbBasemapUrl + '?access_token=' + mbToken, {
+  //       attribution: '<a href="http://mapbox.com">Mapbox</a>'
+  //     }).addTo(map);
+  //
+  //     // Remove 'Leaflet' attribution
+  //     map.attributionControl.setPrefix('');
+  //
+  //     // Add feature layer
+  //     const featureLayer = L.geoJson(blah.geom, {
+  //       onEachFeature: onEachFeature
+  //     }).addTo(map);
+  //
+  //     // Fit to feature layer bounds
+  //     map.fitBounds(featureLayer.getBounds());
+  //
+  //     // Disable drag and zoom handlers
+  //     map.dragging.disable();
+  //     map.touchZoom.disable();
+  //     map.doubleClickZoom.disable();
+  //     map.scrollWheelZoom.disable();
+  //     map.keyboard.disable();
+  //     if (map.tap) map.tap.disable();
+  //   }
 
   function makeValidation(userList){
 
@@ -669,7 +697,7 @@ function addMap (projectId) {
                 <a class="btn btn-blue" href="http://www.openstreetmap.org/message/new/${features.properties.user}">Say Hello<a>
             </div>
         </div>
-    </div>`
+    </div>`;
 
       $('#Validation-Data').append(output);
       // setUserPic(`${features.properties.uid}`);
@@ -685,11 +713,11 @@ function addMap (projectId) {
     let yyyy = today.getFullYear();
 
     if(dd<10) {
-      dd = '0'+dd
+      dd = '0'+dd;
     }
 
     if(mm<10) {
-      mm = '0'+mm
+      mm = '0'+mm;
     }
 
     return today = yyyy + '-' + mm + '-' + dd;
@@ -719,7 +747,7 @@ function addMap (projectId) {
   const mbBasemapUrl = 'https://api.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png';
 
   if (PT.name !== 'Microsites') {
-    showUpdatesPlaceholder()
+    showUpdatesPlaceholder();
     // Populate the primary stats in hero via Missing Maps API
     getPrimaryStats(PT.iso3);
     // Populate initial groups graph via Missing Maps API
