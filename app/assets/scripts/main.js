@@ -23,8 +23,8 @@ function getPrimaryStats (countryId) {
 }
 
 /* -------------------------------------------------------
---------------- Add HOT Project Carousel ----------------
--------------------------------------------------------*/
+ --------------- Add HOT Project Carousel ----------------
+ -------------------------------------------------------*/
 
 // Fetch Project data from Tasking Manager API
 function getProjects (projects) {
@@ -51,132 +51,106 @@ function getProjects (projects) {
     })
     .fail(function (err) {
       console.warn(`WARNING >> Project #${project} could not be accessed at ${url}.\n` +
-        'The server returned the following message object:', err);
-        makePlaceholderProject(project, i + 2);
-      });
+                   'The server returned the following message object:', err);
+      makePlaceholderProject(project, i + 2);
     });
-  }
+  });
+}
 
-  // Update cards with necessary project details
-  function makeProject (project, projectOrder) {
-    const projDone = Math.round(project.percentMapped);
+// Update cards with necessary project details
+function makeProject (project, projectOrder) {
+  const projDone = Math.round(project.percentMapped);
 
-    // Updates Progress Bar
-    $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).addClass('projWidth' + projectOrder);
-    $('.HOT-Progress').append(`<style>.projWidth${projectOrder}:before{ width: ${projDone}%;}</style>`);
+  // Updates Progress Bar
+  $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).addClass('projWidth' + projectOrder);
+  $('.HOT-Progress').append(`<style>.projWidth${projectOrder}:before{ width: ${projDone}%;}</style>`);
 
-    // Adds Project variables to the cards
-    $(`ul li:nth-child(${projectOrder}) .HOT-Title p`).html(`<b>${project.projectId} - ${project.name}</b>`);
-    $(`ul li:nth-child(${projectOrder}) .title`).html(`${project.name} (#${project.projectId})`);
-    $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).html(`<p>${projDone}%</p>`);
-    $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).attr('title', `${projDone}% complete`);
-    $(`ul li:nth-child(${projectOrder}) .HOT-Details .completeness`).html(`<strong>${projDone}%</strong> complete`);
-    $(`ul li:nth-child(${projectOrder}) .HOT-Map`).attr('id', 'Map-' + project.projectId);
+  // Adds Project variables to the cards
+  $(`ul li:nth-child(${projectOrder}) .HOT-Title p`).html(`<b>${project.projectId} - ${project.name}</b>`);
+  $(`ul li:nth-child(${projectOrder}) .title`).html(`${project.name} (#${project.projectId})`);
+  $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).html(`<p>${projDone}%</p>`);
+  $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).attr('title', `${projDone}% complete`);
+  $(`ul li:nth-child(${projectOrder}) .HOT-Details .completeness`).html(`<strong>${projDone}%</strong> complete`);
+  $(`ul li:nth-child(${projectOrder}) .HOT-Map`).attr('id', 'Map-' + project.projectId);
 
-    // Drop a map into the HOT-Map div
-    addMap(project.projectId);
-  }
+  // Drop a map into the HOT-Map div
+  addMap(project.projectId);
+}
 
-  // Adds placeholder/ warning formatting to project carousel entry in the event
-  // that a project cannot be retrieved from the HOT Tasking Manager API
-  function makePlaceholderProject (projectId, projectOrder) {
-    // Adds error title
-    $(`ul li:nth-child(${projectOrder}) .HOT-Title p`)
+// Adds placeholder/ warning formatting to project carousel entry in the event
+// that a project cannot be retrieved from the HOT Tasking Manager API
+function makePlaceholderProject (projectId, projectOrder) {
+  // Adds error title
+  $(`ul li:nth-child(${projectOrder}) .HOT-Title p`)
     .html(`<i class="ico icon collecticon-sign-danger"></i>
-    <b>HOT Project #${projectId} Not Active/Not Found in HOT Tasking Manager</b>`);
+<b>HOT Project #${projectId} Not Active/Not Found in HOT Tasking Manager</b>`);
 
-    // Hides Tasking Manager Contribute button
-    $('#TM-Contribute-Btn-' + projectId).css('display', 'none');
-    $(`#HOT-Title-${projectId} p`).css('width', '100%');
+  // Hides Tasking Manager Contribute button
+  $('#TM-Contribute-Btn-' + projectId).css('display', 'none');
+  $(`#HOT-Title-${projectId} p`).css('width', '100%');
 
-    // Generate issue information for Github tracker
-    const ghIssueTitle = `HOT Tasking Manager endpoint failure in ${PT.mainHashtag} partner page`;
-    const ghIssueBody = `Project ${projectId} is no longer indexed in the HOT
-    Tasking Manager, so it should be removed from the ${PT.mainHashtag} partner
-    page variable settings.`;
+  // Generate issue information for Github tracker
+  const ghIssueTitle = `HOT Tasking Manager endpoint failure in ${PT.mainHashtag} partner page`;
+  const ghIssueBody = `Project ${projectId} is no longer indexed in the HOT
+ Tasking Manager, so it should be removed from the ${PT.mainHashtag} partner
+ page variable settings.`;
 
-    // Add explanatory error text
-    const errorHtml = `Uh oh, it looks like <a href="https://tasks.hotosm.org/api/v1/project/${project};${projectId}"
-    target="_blank">Project #${projectId}</a> has been removed from the HOT Tasking Manager.
-    <a href="https://github.com/MissingMaps/partners/issues/new?title=${ghIssueTitle}
-    &body=${ghIssueBody}" target="_blank">Click here</a> to report an issue or
-    <a href="https://tasks.hotosm.org/" target="_blank">here</a>
-    to search for more projects.`;
+  // Add explanatory error text
+  const errorHtml = `Uh oh, it looks like <a href="https://tasks.hotosm.org/api/v1/project/${project};${projectId}"
+ target="_blank">Project #${projectId}</a> has been removed from the HOT Tasking Manager.
+ <a href="https://github.com/MissingMaps/partners/issues/new?title=${ghIssueTitle}
+ &body=${ghIssueBody}" target="_blank">Click here</a> to report an issue or
+ <a href="https://tasks.hotosm.org/" target="_blank">here</a>
+ to search for more projects.`;
 
-    $(`ul li:nth-child(${projectOrder}) .HOT-Description p`).html(errorHtml);
+  $(`ul li:nth-child(${projectOrder}) .HOT-Description p`).html(errorHtml);
 
-    // Remove loading spinners and add placeholder background
-    $(`ul li:nth-child(${projectOrder}) .HOT-Map`).empty().addClass('placeholder');
-    $(`ul li:nth-child(${projectOrder}) .HOT-Progress `).css('display', 'none');
+  // Remove loading spinners and add placeholder background
+  $(`ul li:nth-child(${projectOrder}) .HOT-Map`).empty().addClass('placeholder');
+  $(`ul li:nth-child(${projectOrder}) .HOT-Progress `).css('display', 'none');
+}
+
+/* -------------------------------------------------------
+ ----------- Add Map to HOT Project Carousel -------------
+ -------------------------------------------------------*/
+
+function onEachFeature (feature, layer) {
+  // Set symbology to match HOTOSM Tasking Manager completion states
+  let symbology = {
+    color: 'black',
+    weight: 0.25,
+    opacity: 0.7,
+    fillOpacity: 0.4,
+    fillColor: 'black'
+  };
+
+  const taskStatus = feature.properties.taskStatus;
+  if (taskStatus === "READY") {
+    symbology.fillColor = '#ffffff'; //white
+    symbology.fillOpacity = 0.0;  //transparent
+  } else if (taskStatus === "INVALIDATED") {
+    symbology.fillColor = '#e90b43'; //red
+  } else if (taskStatus === "VALIDATED") {
+    symbology.fillColor = '#008000'; //green
+  } else if (taskStatus === "LOCKED_FOR_MAPPING") {
+    symbology.fillColor = '#1259F0'; //blue
+  } else if (taskStatus === "MAPPED") {
+    symbology.fillColor = '#ffcc00'; //yellow
   }
 
-  /* -------------------------------------------------------
-  ----------- Add Map to HOT Project Carousel -------------
-  -------------------------------------------------------*/
+  layer.setStyle(symbology);
+}
 
-  function onEachFeature (feature, layer) {
-    // Set symbology to match HOTOSM Tasking Manager completion states
-    let symbology = {
-      color: 'black',
-      weight: 0.25,
-      opacity: 0.7,
-      fillOpacity: 0.4,
-      fillColor: 'black'
-    };
+function addMap (projectId) {
+  // Connect HOT-OSM endpoint for tasking squares data
+  const endpoint = `https://tasks.hotosm.org/api/v1/project/${projectId}`;
+  $.getJSON(endpoint, function (taskData) {
+    // Remove loading spinners before placing map
+    $('#Map-' + projectId).empty();
 
-    const taskStatus = feature.properties.taskStatus;
-    if (taskStatus === "READY") {
-      symbology.fillColor = '#ffffff'; //white
-      symbology.fillOpacity = 0.0;  //transparent
-    } else if (taskStatus === "INVALIDATED") {
-      symbology.fillColor = '#e90b43'; //red
-    } else if (taskStatus === "VALIDATED") {
-      symbology.fillColor = '#008000'; //green
-    } else if (taskStatus === "LOCKED_FOR_MAPPING") {
-      symbology.fillColor = '#1259F0'; //blue
-    } else if (taskStatus === "MAPPED") {
-      symbology.fillColor = '#ffcc00'; //yellow
-    }
-
-    layer.setStyle(symbology);
-  }
-
-  function addMap (projectId) {
-    // Connect HOT-OSM endpoint for tasking squares data
-    const endpoint = `https://tasks.hotosm.org/api/v1/project/${projectId}`;
-    $.getJSON(endpoint, function (taskData) {
-      // Remove loading spinners before placing map
-      $('#Map-' + projectId).empty();
-
-      // Initialize map
-      const map = L.map('Map-' + projectId,
+    // Initialize map
+    const map = L.map('Map-' + projectId,
       {zoomControl: false}).setView([38.889931, -77.009003], 13);
-
-      // Add tile layer
-      L.tileLayer(mbBasemapUrl + '?access_token=' + mbToken, {
-        attribution: '<a href="http://mapbox.com">Mapbox</a>'
-      }).addTo(map);
-
-      // Remove 'Leaflet' attribution
-      map.attributionControl.setPrefix('');
-
-      // Add feature layer
-      const featureLayer = L.geoJson(taskData.tasks, {
-        onEachFeature: onEachFeature
-      }).addTo(map);
-
-      // Fit to feature layer bounds
-      map.fitBounds(featureLayer.getBounds());
-
-      // Disable drag and zoom handlers
-      map.dragging.disable();
-      map.touchZoom.disable();
-      map.doubleClickZoom.disable();
-      map.scrollWheelZoom.disable();
-      map.keyboard.disable();
-      if (map.tap) map.tap.disable();
-    });
-  }
 
   /* -------------------------------------------------------
   ----------- Add Functionality to Events List  -----------
