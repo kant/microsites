@@ -23,8 +23,8 @@ function getPrimaryStats (countryId) {
 }
 
 /* -------------------------------------------------------
- --------------- Add HOT Project Carousel ----------------
- -------------------------------------------------------*/
+--------------- Add HOT Project Carousel ----------------
+-------------------------------------------------------*/
 
 // Fetch Project data from Tasking Manager API
 function getProjects (projects) {
@@ -51,132 +51,132 @@ function getProjects (projects) {
     })
     .fail(function (err) {
       console.warn(`WARNING >> Project #${project} could not be accessed at ${url}.\n` +
-                   'The server returned the following message object:', err);
-      makePlaceholderProject(project, i + 2);
+        'The server returned the following message object:', err);
+        makePlaceholderProject(project, i + 2);
+      });
     });
-  });
-}
-
-// Update cards with necessary project details
-function makeProject (project, projectOrder) {
-  const projDone = Math.round(project.percentMapped);
-
-  // Updates Progress Bar
-  $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).addClass('projWidth' + projectOrder);
-  $('.HOT-Progress').append(`<style>.projWidth${projectOrder}:before{ width: ${projDone}%;}</style>`);
-
-  // Adds Project variables to the cards
-  $(`ul li:nth-child(${projectOrder}) .HOT-Title p`).html(`<b>${project.projectId} - ${project.name}</b>`);
-  $(`ul li:nth-child(${projectOrder}) .title`).html(`${project.name} (#${project.projectId})`);
-  $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).html(`<p>${projDone}%</p>`);
-  $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).attr('title', `${projDone}% complete`);
-  $(`ul li:nth-child(${projectOrder}) .HOT-Details .completeness`).html(`<strong>${projDone}%</strong> complete`);
-  $(`ul li:nth-child(${projectOrder}) .HOT-Map`).attr('id', 'Map-' + project.projectId);
-
-  // Drop a map into the HOT-Map div
-  addMap(project.projectId);
-}
-
-// Adds placeholder/ warning formatting to project carousel entry in the event
-// that a project cannot be retrieved from the HOT Tasking Manager API
-function makePlaceholderProject (projectId, projectOrder) {
-  // Adds error title
-  $(`ul li:nth-child(${projectOrder}) .HOT-Title p`)
-    .html(`<i class="ico icon collecticon-sign-danger"></i>
-<b>HOT Project #${projectId} Not Active/Not Found in HOT Tasking Manager</b>`);
-
-  // Hides Tasking Manager Contribute button
-  $('#TM-Contribute-Btn-' + projectId).css('display', 'none');
-  $(`#HOT-Title-${projectId} p`).css('width', '100%');
-
-  // Generate issue information for Github tracker
-  const ghIssueTitle = `HOT Tasking Manager endpoint failure in ${PT.mainHashtag} partner page`;
-  const ghIssueBody = `Project ${projectId} is no longer indexed in the HOT
- Tasking Manager, so it should be removed from the ${PT.mainHashtag} partner
- page variable settings.`;
-
-  // Add explanatory error text
-  const errorHtml = `Uh oh, it looks like <a href="https://tasks.hotosm.org/api/v1/project/${project};${projectId}"
- target="_blank">Project #${projectId}</a> has been removed from the HOT Tasking Manager.
- <a href="https://github.com/MissingMaps/partners/issues/new?title=${ghIssueTitle}
- &body=${ghIssueBody}" target="_blank">Click here</a> to report an issue or
- <a href="https://tasks.hotosm.org/" target="_blank">here</a>
- to search for more projects.`;
-
-  $(`ul li:nth-child(${projectOrder}) .HOT-Description p`).html(errorHtml);
-
-  // Remove loading spinners and add placeholder background
-  $(`ul li:nth-child(${projectOrder}) .HOT-Map`).empty().addClass('placeholder');
-  $(`ul li:nth-child(${projectOrder}) .HOT-Progress `).css('display', 'none');
-}
-
-/* -------------------------------------------------------
- ----------- Add Map to HOT Project Carousel -------------
- -------------------------------------------------------*/
-
-function onEachFeature (feature, layer) {
-  // Set symbology to match HOTOSM Tasking Manager completion states
-  let symbology = {
-    color: 'black',
-    weight: 0.25,
-    opacity: 0.7,
-    fillOpacity: 0.4,
-    fillColor: 'black'
-  };
-
-  const taskStatus = feature.properties.taskStatus;
-  if (taskStatus === "READY") {
-    symbology.fillColor = '#ffffff'; //white
-    symbology.fillOpacity = 0.0;  //transparent
-  } else if (taskStatus === "INVALIDATED") {
-    symbology.fillColor = '#e90b43'; //red
-  } else if (taskStatus === "VALIDATED") {
-    symbology.fillColor = '#008000'; //green
-  } else if (taskStatus === "LOCKED_FOR_MAPPING") {
-    symbology.fillColor = '#1259F0'; //blue
-  } else if (taskStatus === "MAPPED") {
-    symbology.fillColor = '#ffcc00'; //yellow
   }
 
-  layer.setStyle(symbology);
-}
+  // Update cards with necessary project details
+  function makeProject (project, projectOrder) {
+    const projDone = Math.round(project.percentMapped);
 
-function addMap (projectId) {
-  // Connect HOT-OSM endpoint for tasking squares data
-  const endpoint = `https://tasks.hotosm.org/api/v1/project/${projectId}`;
-  $.getJSON(endpoint, function (taskData) {
-    // Remove loading spinners before placing map
-    $('#Map-' + projectId).empty();
+    // Updates Progress Bar
+    $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).addClass('projWidth' + projectOrder);
+    $('.HOT-Progress').append(`<style>.projWidth${projectOrder}:before{ width: ${projDone}%;}</style>`);
 
-    // Initialize map
-    const map = L.map('Map-' + projectId,
+    // Adds Project variables to the cards
+    $(`ul li:nth-child(${projectOrder}) .HOT-Title p`).html(`<b>${project.projectId} - ${project.name}</b>`);
+    $(`ul li:nth-child(${projectOrder}) .title`).html(`${project.name} (#${project.projectId})`);
+    $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).html(`<p>${projDone}%</p>`);
+    $(`ul li:nth-child(${projectOrder}) .HOT-Progress`).attr('title', `${projDone}% complete`);
+    $(`ul li:nth-child(${projectOrder}) .HOT-Details .completeness`).html(`<strong>${projDone}%</strong> complete`);
+    $(`ul li:nth-child(${projectOrder}) .HOT-Map`).attr('id', 'Map-' + project.projectId);
+
+    // Drop a map into the HOT-Map div
+    addMap(project.projectId);
+  }
+
+  // Adds placeholder/ warning formatting to project carousel entry in the event
+  // that a project cannot be retrieved from the HOT Tasking Manager API
+  function makePlaceholderProject (projectId, projectOrder) {
+    // Adds error title
+    $(`ul li:nth-child(${projectOrder}) .HOT-Title p`)
+    .html(`<i class="ico icon collecticon-sign-danger"></i>
+    <b>HOT Project #${projectId} Not Active/Not Found in HOT Tasking Manager</b>`);
+
+    // Hides Tasking Manager Contribute button
+    $('#TM-Contribute-Btn-' + projectId).css('display', 'none');
+    $(`#HOT-Title-${projectId} p`).css('width', '100%');
+
+    // Generate issue information for Github tracker
+    const ghIssueTitle = `HOT Tasking Manager endpoint failure in ${PT.mainHashtag} partner page`;
+    const ghIssueBody = `Project ${projectId} is no longer indexed in the HOT
+    Tasking Manager, so it should be removed from the ${PT.mainHashtag} partner
+    page variable settings.`;
+
+    // Add explanatory error text
+    const errorHtml = `Uh oh, it looks like <a href="https://tasks.hotosm.org/api/v1/project/${project};${projectId}"
+    target="_blank">Project #${projectId}</a> has been removed from the HOT Tasking Manager.
+    <a href="https://github.com/MissingMaps/partners/issues/new?title=${ghIssueTitle}
+    &body=${ghIssueBody}" target="_blank">Click here</a> to report an issue or
+    <a href="https://tasks.hotosm.org/" target="_blank">here</a>
+    to search for more projects.`;
+
+    $(`ul li:nth-child(${projectOrder}) .HOT-Description p`).html(errorHtml);
+
+    // Remove loading spinners and add placeholder background
+    $(`ul li:nth-child(${projectOrder}) .HOT-Map`).empty().addClass('placeholder');
+    $(`ul li:nth-child(${projectOrder}) .HOT-Progress `).css('display', 'none');
+  }
+
+  /* -------------------------------------------------------
+  ----------- Add Map to HOT Project Carousel -------------
+  -------------------------------------------------------*/
+
+  function onEachFeature (feature, layer) {
+    // Set symbology to match HOTOSM Tasking Manager completion states
+    let symbology = {
+      color: 'black',
+      weight: 0.25,
+      opacity: 0.7,
+      fillOpacity: 0.4,
+      fillColor: 'black'
+    };
+
+    const taskStatus = feature.properties.taskStatus;
+    if (taskStatus === "READY") {
+      symbology.fillColor = '#ffffff'; //white
+      symbology.fillOpacity = 0.0;  //transparent
+    } else if (taskStatus === "INVALIDATED") {
+      symbology.fillColor = '#e90b43'; //red
+    } else if (taskStatus === "VALIDATED") {
+      symbology.fillColor = '#008000'; //green
+    } else if (taskStatus === "LOCKED_FOR_MAPPING") {
+      symbology.fillColor = '#1259F0'; //blue
+    } else if (taskStatus === "MAPPED") {
+      symbology.fillColor = '#ffcc00'; //yellow
+    }
+
+    layer.setStyle(symbology);
+  }
+
+  function addMap (projectId) {
+    // Connect HOT-OSM endpoint for tasking squares data
+    const endpoint = `https://tasks.hotosm.org/api/v1/project/${projectId}`;
+    $.getJSON(endpoint, function (taskData) {
+      // Remove loading spinners before placing map
+      $('#Map-' + projectId).empty();
+
+      // Initialize map
+      const map = L.map('Map-' + projectId,
       {zoomControl: false}).setView([38.889931, -77.009003], 13);
 
-    // Add tile layer
-    L.tileLayer(mbBasemapUrl + '?access_token=' + mbToken, {
-      attribution: '<a href="http://mapbox.com">Mapbox</a>'
-    }).addTo(map);
+      // Add tile layer
+      L.tileLayer(mbBasemapUrl + '?access_token=' + mbToken, {
+        attribution: '<a href="http://mapbox.com">Mapbox</a>'
+      }).addTo(map);
 
-    // Remove 'Leaflet' attribution
-    map.attributionControl.setPrefix('');
+      // Remove 'Leaflet' attribution
+      map.attributionControl.setPrefix('');
 
-    // Add feature layer
-    const featureLayer = L.geoJson(taskData.tasks, {
-      onEachFeature: onEachFeature
-    }).addTo(map);
+      // Add feature layer
+      const featureLayer = L.geoJson(taskData.tasks, {
+        onEachFeature: onEachFeature
+      }).addTo(map);
 
-    // Fit to feature layer bounds
-    map.fitBounds(featureLayer.getBounds());
+      // Fit to feature layer bounds
+      map.fitBounds(featureLayer.getBounds());
 
-    // Disable drag and zoom handlers
-    map.dragging.disable();
-    map.touchZoom.disable();
-    map.doubleClickZoom.disable();
-    map.scrollWheelZoom.disable();
-    map.keyboard.disable();
-    if (map.tap) map.tap.disable();
-  });
-}
+      // Disable drag and zoom handlers
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.keyboard.disable();
+      if (map.tap) map.tap.disable();
+    });
+  }
 
   /* -------------------------------------------------------
   ----------- Add Functionality to Events List  -----------
@@ -587,41 +587,149 @@ function addMap (projectId) {
     }
   }
 
-  /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  ---------------------------------------------------------
+  /* -------------------------------------------------------
   --------------------- OSMCha ---------------------
   -------------------------------------------------------*/
 
+
+  // function setUserPic(userId) {
+  //   // var component = this;
+  //   $.get('http://api.openstreetmap.org/api/0.6/user/' + userId, function (data) {
+  //     var localGenericUrl = 'http://www.missingmaps.org/users/assets/graphics/osm-user-blank.jpg';
+  //     var url = '';
+  //     var urls = [];
+  //     // Check for img href in user profile
+  //     var xml = $.parseXML(data),
+  //     $xml = $( xml ),
+  //     $img = $xml.find('img');
+  //     $imgsrc = $img.find()
+  //     var urlBegin = xmlString.split('<img href="')[1];
+  //     // If no img href, set state to the local generic image
+  //     // (user's profile pic is generic)
+  //     if (!urlBegin) {
+  //       url = localGenericUrl;
+  //       return url;
+  //     } else {
+  //       url = urlBegin.substring(0, urlBegin.indexOf('"/>'));
+  //       urls = url.split('&amp;d=');
+  //       if (urls.length < 2) {
+  //         // If one img href, use the 'large' version to set
+  //         // state (it is the user's custom OSM profile pic)
+  //         url = url.replace('/original/', '/large/');
+  //         return url;
+  //       } else {
+  //         // If >one img href, pic is from Gravatar, so check if
+  //         // user has custom or generic pic and set state to local
+  //         // generic or 128px version of their pic accordingly.
+  //         url = urls[0].replace('?s=256', '?s=128');
+  //         return url;
+  //       }
+  //     }
+  //
+  //     $(`#mapper-${userId}`).attr("src", url);
+  //   });
+  // }
+
+  function addeditsMap (edits) {
+     const blah = edits;
+      // Remove loading spinners before placing map
+      // $(`#Map-Box-${blah.id}`).empty();
+
+      // Initialize map
+      console.log(`#Map-Box-${blah.id}`);
+      const map = L.map(`#Map-Box-${blah.id}`,
+      {zoomControl: false}).setView([38.889931, -77.009003], 13);
+
+      // Add tile layer
+      L.tileLayer(mbBasemapUrl + '?access_token=' + mbToken, {
+        attribution: '<a href="http://mapbox.com">Mapbox</a>'
+      }).addTo(map);
+
+      // Remove 'Leaflet' attribution
+      map.attributionControl.setPrefix('');
+
+      // Add feature layer
+      const featureLayer = L.geoJson(blah.geom, {
+        onEachFeature: onEachFeature
+      }).addTo(map);
+
+      // Fit to feature layer bounds
+      map.fitBounds(featureLayer.getBounds());
+
+      // Disable drag and zoom handlers
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.keyboard.disable();
+      if (map.tap) map.tap.disable();
+    }
+
   function makeValidation(userList){
-    const users = userList.features;
-    console.log(users);
+
+    const users = _.uniqBy(userList.features, 'properties.uid');
+    const mappercount = users.length;
+
+    $('#Mapper-Count').html(mappercount);
 
     users.forEach(function (features) {
-      console.log('USER: ' + features);
-      const output = `<tr>`+
-      `<td><a href="http://www.missingmaps.org/users/#/${features.properties.user}">${features.properties.user}</a></td>`+
-      `<td>${features.properties.date.slice(0,10)}</td>`+
-      `<td><span class="badge success">${features.properties.create}</span><span class="badge warning">${features.properties.modify}</span><span class="badge alert">${features.properties.delete}</span></td>`+
-      `<td><a href="https://osmcha.mapbox.com/changesets/${features.id}">Review Edit<a></td>`+
-      `<td>${features.properties.comment}</td>`+
-      `</tr>`
+      const output =
 
-      // $('#Validation-Data').insertRow(output);
-      $('#Validation-Data > tbody:last-child').append(output);
+    `<div class="column">
+        <div class="card">
+                 <div class="center" style="">
+                    <img class="user-circle mapper-${features.properties.uid}" style="width:50px;margin-top:5px;" src="http://www.missingmaps.org/users/assets/graphics/osm-user-blank.jpg" />
+                    <h6><a href="http://www.missingmaps.org/users/#/${features.properties.user}">${features.properties.user}</a></h4>
+                  </div>
+                  <!--<div id="Map-Box-${features.id}" class="column small-2">
+                  </div>-->
+            <div class="">
+                <h6>Last Edit: ${features.properties.date.slice(0,10)}</h6>
+                <h6>Edits: <span class="badge success edits">${features.properties.create}</span><span class="badge warning edits">${features.properties.modify}</span><span class="badge alert edits">${features.properties.delete}</span></h6>
+
+                <!--<div class="map-box">
+
+                </div>-->
+                <br>
+                <a class="btn btn-blue" href="https://osmcha.mapbox.com/changesets/${features.id}">Review Edit<a>
+                <a class="btn btn-blue" href="http://www.openstreetmap.org/message/new/${features.properties.user}">Say Hello<a>
+            </div>
+        </div>
+    </div>`
+
+      $('#Validation-Data').append(output);
+      // setUserPic(`${features.properties.uid}`);
+      // addeditsMap(features);
+
     });
   }
 
+  function getDate(){
+    let today = new Date();
+    let dd = today.getDate()-7; //get new mappers from the past week
+    let mm = today.getMonth()+1; //January is 0!
+    let yyyy = today.getFullYear();
+
+    if(dd<10) {
+      dd = '0'+dd
+    }
+
+    if(mm<10) {
+      mm = '0'+mm
+    }
+
+    return today = yyyy + '-' + mm + '-' + dd;
+
+  }
 
   function getValidation (bbox) {
 
     const bbx = bbox.split(',');
-
-    let url = `https://osmcha.mapbox.com/api/v1/changesets/?page=1&page_size=10&order_by=-date&reasons=40&date__gte=2017-11-02&in_bbox=${bbx[0]},${bbx[1]},${bbx[2]},${bbx[3]}`;
-
-    console.log(url);
+    let valDate = getDate();
+    let url = `https://osmcha.mapbox.com/api/v1/changesets/?page=1&page_size=15&order_by=-date&reasons=40&date__gte=${valDate}&in_bbox=${bbx[0]},${bbx[1]},${bbx[2]},${bbx[3]}`;
 
     $.getJSON(url, function (data) {
-      makeValidation(data)
+      makeValidation(data);
     })
     .fail(function (err) {
       console.warn('No New Mappers', err);
